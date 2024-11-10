@@ -73,7 +73,7 @@ const News = (props) => {
         loader={<Loading />}
         endMessage={<p style={{ textAlign: "center" }}>No more articles to load </p>}
       >
-        <div className="container overflow-hidden">
+        <div className="container overflow-hidden mx-4">
           <div className="row">
             {articles.map((element) => (
               <div key={element.url} className="col-md-4">
