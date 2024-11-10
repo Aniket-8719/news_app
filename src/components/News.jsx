@@ -15,7 +15,7 @@ const News = (props) => {
 
   const updateNews = async () => {
     if (props.setProgress) props.setProgress(10);
-    const url = `${import.meta.env.VITE_APP_API_URL}?country=us&category=${props.category}&apiKey=${import.meta.env.VITE_APP_NEWS_API_KEY}&page=${page}&pageSize=${props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${import.meta.env.VITE_APP_NEWS_API_KEY}&page=${page}&pageSize=${props.pageSize}`;
     setLoading(true);
     try {
       let data = await fetch(url);
@@ -39,7 +39,7 @@ const News = (props) => {
 
   const fetchMoreData = async () => {
     setPage(prevPage => prevPage + 1); // Increment page
-    const url = `${import.meta.env.VITE_APP_API_URL}?country=us&category=${props.category}&apiKey=${import.meta.env.VITE_APP_NEWS_API_KEY}&page=${page + 1}&pageSize=${props.pageSize}`;
+    const url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${import.meta.env.VITE_APP_NEWS_API_KEY}&page=${page + 1}&pageSize=${props.pageSize}`;
     try {
       let data = await fetch(url);
       let parsedData = await data.json();
