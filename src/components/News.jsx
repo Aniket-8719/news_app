@@ -4,10 +4,13 @@ import Newsitem from "./Newsitem";
 import Loading from "./Loading";
 import InfiniteScroll from "react-infinite-scroll-component";
 
+// Define the base URL and API endpoints for easier management
+const BASE_URL = "https://saurav.tech/NewsAPI/";
+
 const News = (props) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0); // Mediastack uses offset for pagination
+  const [page, setPage] = useState(1); // Start from page 1
   const [totalResults, setTotalResults] = useState(0);
   const [error, setError] = useState(null);
 
@@ -15,14 +18,16 @@ const News = (props) => {
 
   const updateNews = async () => {
     if (props.setProgress) props.setProgress(10);
-    const apiKey = import.meta.env.VITE_NEWS_API_KEY; // Fetch API key from .env
-    const url = `https://api.mediastack.com/v1/news?access_key=${apiKey}&countries=${props.country}&categories=${props.category}&limit=${props.pageSize}&offset=${page}`;
+
+    // Construct the URL for top-headlines based on category and country
+    const url = `${BASE_URL}top-headlines/category/${props.category}/${props.country}.json`;
+    
     setLoading(true);
     try {
       let data = await fetch(url);
       let parsedData = await data.json();
-      setArticles(parsedData.data); // Mediastack returns articles inside "data"
-      setTotalResults(parsedData.pagination.total); // Total articles available
+      setArticles(parsedData.articles || []); // Assuming 'articles' field in the response
+      setTotalResults(parsedData.totalResults || 0); // Assuming 'totalResults' field
       setLoading(false);
       if (props.setProgress) props.setProgress(100);
     } catch (error) {
@@ -39,14 +44,17 @@ const News = (props) => {
   }, [props.category, props.pageSize, props.country, page]);
 
   const fetchMoreData = async () => {
-    setPage(prevPage => prevPage + props.pageSize); // Increment offset by page size
+    setPage(prevPage => prevPage + 1); // Increment page
     const apiKey = import.meta.env.VITE_NEWS_API_KEY; // Fetch API key from .env
-    const url = `https://api.mediastack.com/v1/news?access_key=${apiKey}&countries=${props.country}&categories=${props.category}&limit=${props.pageSize}&offset=${page + props.pageSize}`;
+
+    // Construct the URL for fetching more data
+    const url = `${BASE_URL}top-headlines/category/${props.category}/${props.country}.json?page=${page + 1}&pageSize=${props.pageSize}`;
+    
     try {
       let data = await fetch(url);
       let parsedData = await data.json();
-      setArticles(prevArticles => prevArticles.concat(parsedData.data));
-      setTotalResults(parsedData.pagination.total);
+      setArticles(prevArticles => prevArticles.concat(parsedData.articles || []));
+      setTotalResults(parsedData.totalResults || 0);
     } catch (error) {
       console.error("Error fetching more data:", error);
     }
@@ -80,11 +88,11 @@ const News = (props) => {
                 <Newsitem
                   title={element.title || ""}
                   description={element.description || ""}
-                  imgUrl={element.image || "default_image_url_here"} // Mediastack provides 'image'
+                  imgUrl={element.urlToImage || "default_image_url_here"} // Use 'urlToImage' from the response
                   newsUrl={element.url}
                   author={element.author || "Unknown"}
-                  date={element.published_at}
-                  channel={element.source}
+                  date={element.publishedAt}
+                  channel={element.source.name}
                 />
               </div>
             ))}
