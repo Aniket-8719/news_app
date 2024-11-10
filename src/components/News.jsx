@@ -81,21 +81,23 @@ const News = (props) => {
         loader={<Loading />}
         endMessage={<p style={{ textAlign: "center" }}>No more articles to load </p>}
       >
-        <div className="container overflow-hidden mx-4">
-          <div className="row">
-            {articles.map((element) => (
-              <div key={element.url} className="col-md-4">
-                <Newsitem
-                  title={element.title || ""}
-                  description={element.description || ""}
-                  imgUrl={element.urlToImage || "default_image_url_here"} // Use 'urlToImage' from the response
-                  newsUrl={element.url}
-                  author={element.author || "Unknown"}
-                  date={element.publishedAt}
-                  channel={element.source.name}
-                />
-              </div>
-            ))}
+        <div>
+          <div className="container overflow-hidden">
+            <div className="row">
+              {articles.map((element) => (
+                <div key={element.url} className="col-12 col-md-4 col-lg-3 mb-4">
+                  <Newsitem
+                    title={element.title || ""}
+                    description={element.description || ""}
+                    imgUrl={element.urlToImage || "default_image_url_here"} // Use 'urlToImage' from the response
+                    newsUrl={element.url}
+                    author={element.author || "Unknown"}
+                    date={element.publishedAt}
+                    channel={element.source.name}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </InfiniteScroll>
