@@ -7,7 +7,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 const News = (props) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0); // Mediastack uses offset for pagination
   const [totalResults, setTotalResults] = useState(0);
   const [error, setError] = useState(null);
 
@@ -15,13 +15,14 @@ const News = (props) => {
 
   const updateNews = async () => {
     if (props.setProgress) props.setProgress(10);
-    const url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${import.meta.env.VITE_NEWS_API_KEY}&page=${page}&pageSize=${props.pageSize}`;
+    const apiKey = import.meta.env.VITE_NEWS_API_KEY; // Fetch API key from .env
+    const url = `https://api.mediastack.com/v1/news?access_key=${apiKey}&countries=${props.country}&categories=${props.category}&limit=${props.pageSize}&offset=${page}`;
     setLoading(true);
     try {
       let data = await fetch(url);
       let parsedData = await data.json();
-      setArticles(parsedData.articles);
-      setTotalResults(parsedData.totalResults);
+      setArticles(parsedData.data); // Mediastack returns articles inside "data"
+      setTotalResults(parsedData.pagination.total); // Total articles available
       setLoading(false);
       if (props.setProgress) props.setProgress(100);
     } catch (error) {
@@ -38,13 +39,14 @@ const News = (props) => {
   }, [props.category, props.pageSize, props.country, page]);
 
   const fetchMoreData = async () => {
-    setPage(prevPage => prevPage + 1); // Increment page
-    const url = `https://newsapi.org/v2/top-headlines?country=us&category=${props.category}&apiKey=${import.meta.env.VITE_NEWS_API_KEY}&page=${page + 1}&pageSize=${props.pageSize}`;
+    setPage(prevPage => prevPage + props.pageSize); // Increment offset by page size
+    const apiKey = import.meta.env.VITE_NEWS_API_KEY; // Fetch API key from .env
+    const url = `https://api.mediastack.com/v1/news?access_key=${apiKey}&countries=${props.country}&categories=${props.category}&limit=${props.pageSize}&offset=${page + props.pageSize}`;
     try {
       let data = await fetch(url);
       let parsedData = await data.json();
-      setArticles(prevArticles => prevArticles.concat(parsedData.articles));
-      setTotalResults(parsedData.totalResults);
+      setArticles(prevArticles => prevArticles.concat(parsedData.data));
+      setTotalResults(parsedData.pagination.total);
     } catch (error) {
       console.error("Error fetching more data:", error);
     }
@@ -78,11 +80,11 @@ const News = (props) => {
                 <Newsitem
                   title={element.title || ""}
                   description={element.description || ""}
-                  imgUrl={element.urlToImage || "default_image_url_here"}
+                  imgUrl={element.image || "default_image_url_here"} // Mediastack provides 'image'
                   newsUrl={element.url}
                   author={element.author || "Unknown"}
-                  date={element.publishedAt}
-                  channel={element.source.name}
+                  date={element.published_at}
+                  channel={element.source}
                 />
               </div>
             ))}
