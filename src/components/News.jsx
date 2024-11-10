@@ -87,7 +87,7 @@ const News = (props) => {
         hasMore={articles.length < totalResults} // Ensure it fetches until all results are loaded
         loader={<Loading />}
         endMessage={
-          <p style={{ textAlign: "center" }}>No more articles to load</p>
+          <p style={{ textAlign: "center" }}>No more articles to load </p>
         }
       >
         <div className="container overflow-hidden">
