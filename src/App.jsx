@@ -19,7 +19,6 @@ function App() {
     
      <Navbar/>
      <Routes>
-          
           <Route  exact  path='/' element={<News setProgress={setProgress}   key="general" pageSize={pageAmount} country={'in'} category={'general'} />} />
           <Route  exact  path='/business' element={<News setProgress={setProgress}    key="business" pageSize={pageAmount} country={'in'} category={'business'} />} />
           <Route  exact  path='/entertainment' element={<News setProgress={setProgress}    key="entertainment" pageSize={pageAmount} country={'in'} category={'entertainment'} />} />
